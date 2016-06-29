@@ -1,13 +1,22 @@
 var currentMap;
 
+var currentNum = 1;
+
+function objPropCreator() {
+    return {
+        markers: [],
+        plans: {
+            hotels: [],
+            restaurants: [],
+            activities: []
+        },
+        num: 0
+    }
+}
+
 var daysObj = {
-  day1: {
-    markers: [],
-
-  }
+    1: objPropCreator()
 };
-
-var markers = [];
 
 $(function initializeMap() {
 
@@ -79,16 +88,70 @@ function drawMarker(type, coords) {
         icon: iconURL,
         position: latLng
     });
-    markers.push(marker);
-    console.log(markers);
+    daysObj[currentNum].markers.push(marker);
+
 
 
     marker.setMap(currentMap);
 }
 
 function removeMarkers(index) {
-    markers[index].setMap(null);
+    console.log('removeMarkers', daysObj)
+    daysObj[currentNum].markers[index].setMap(null);
+}
 
+function clearMarkers() {
+    daysObj[currentNum].markers.forEach(function(marker) {
+        marker.setMap(null);
+    })
+}
+
+function showMarkers() {
+    console.log(currentNum, daysObj[currentNum])
+    daysObj[currentNum].markers.forEach(function(marker) {
+        marker.setMap(currentMap);
+    })
+}
+
+function clearPanel() {
+    $('#list-hotel').children().remove();
+    $('#list-restaurant').children().remove();
+    $('#list-activity').children().remove();
+}
+
+var panelIds = ['#list-hotel', '#list-restaurant', '#list-activity'];
+
+// function showPanel() {
+//   console.log(daysObj[currentNum].plans)
+//   var n = 0;
+//   for (var events in daysObj[currentNum].plans) {
+//     events.forEach(function(plan) {
+//       var added = $(plan).appendTo(panelIds[n]);
+//       added.data('index', num);
+//       num++
+//     })
+//     n++;
+//   }
+// }
+
+function showPanel() {
+    daysObj[currentNum].plans.hotels.forEach(function(hotel) {
+        var added = $(hotel).appendTo('#list-hotel');
+        added.data('index', daysObj[currentNum].num);
+        daysObj[currentNum].num++;
+    })
+
+    daysObj[currentNum].plans.restaurants.forEach(function(restaurant) {
+        var added = $(restaurant).appendTo('#list-restaurant');
+        added.data('index', daysObj[currentNum].num);
+        daysObj[currentNum].num++;
+    })
+
+    daysObj[currentNum].plans.activities.forEach(function(activity) {
+        var added = $(activity).appendTo('#list-activity');
+        added.data('index', daysObj[currentNum].num);
+        daysObj[currentNum].num++;
+    })
 }
 
 // drawMarker('hotel', [40.705137, -74.007624]);
@@ -96,7 +159,7 @@ function removeMarkers(index) {
 // drawMarker('activity', [40.716291, -73.995315]);
 
 
-var num = 0;
+
 $(document).ready(function() {
 
     var button = '<button class="btn btn-xs btn-danger remove btn-circle">x</button>'
@@ -123,8 +186,10 @@ $(document).ready(function() {
         var hotelName = $('#hotel-choices option:selected').val();
         var hotel = '<p>' + hotelName + button + '</p>'
         var hotelAdded = $(hotel).appendTo('#list-hotel');
-        hotelAdded.data('index', num);
-        num++;
+
+        daysObj[currentNum].plans.hotels.push(hotel);
+        hotelAdded.data('index', daysObj[currentNum].num);
+        daysObj[currentNum].num++;
         var location = objectReturner(hotels, hotelName);
         var newMarker = drawMarker('hotel', location);
         // drawMarker('hotel', );
@@ -138,8 +203,9 @@ $(document).ready(function() {
         var restaurant = '<p>' + restaurantName + button + '</p>';
         var restaurantAdded = $(restaurant).appendTo('#list-restaurant');
         // drawMarker('restaurant', );
-        restaurantAdded.data('index', num);
-        num++;
+        daysObj[currentNum].plans.restaurants.push(restaurant);
+        restaurantAdded.data('index', daysObj[currentNum].num);
+        daysObj[currentNum].num++;
         // }
         var location = objectReturner(restaurants, restaurantName);
         drawMarker('restaurant', location);
@@ -152,8 +218,9 @@ $(document).ready(function() {
         var activity = '<p>' + activityName + button + '</p>';
         var activityAdded = $(activity).appendTo('#list-activity');
         // drawMarker('activity', );
-        activityAdded.data('index', num);
-        num++;
+        daysObj[currentNum].plans.activities.push(activity);
+        activityAdded.data('index', daysObj[currentNum].num);
+        daysObj[currentNum].num++;
 
         var location = objectReturner(activities, activityName);
         drawMarker('activity', location);
@@ -170,7 +237,49 @@ $(document).ready(function() {
 
     $('#day-add').on('click', function() {
         var current = $(this).parent().children().length;
-        $(this).before('<button class="btn btn-circle day-btn">' + current + '</button>')
+        $(this).before('<button class="btn btn-circle day-btn" id="current-day">' + current + '</button>')
     });
+
+    $('.panel').on('click', '#current-day', function() {
+        if (+$(this).text() == currentNum) return;
+        else {
+            clearPanel();
+            clearMarkers();
+            daysObj[currentNum].num = 0;
+            currentNum = +$(this).text();
+            if (!daysObj[currentNum]) daysObj[currentNum] = objPropCreator();
+            $('#day-number').text('Day ' + currentNum.toString());
+            showMarkers();
+            showPanel();
+        }
+    })
+
+    $('#day-title').on('click', '#delete-day', function() {
+        var currentDay = +$('#day-number').text();
+        console.log(daysObj[currentNum]);
+        clearPanel();
+        clearMarkers();
+        for (var keys in daysObj.hasOwnProperty(keys)) {
+            console.log(keys);
+            if (currentNum <= keys) {
+                var next = +keys + 1
+                if (daysObj[next]) {
+                    console.log('settingVal')
+                    daysObj[keys] = daysObj[next]
+                } else daysObj[keys] = null;
+            }
+
+            console.log('BLUE', daysObj)
+        }
+        if (currentDay == currentNum) {
+            currentNum--;
+            var newNum = currentNum - 1;
+            $('#day-number').text('Day ' + newNum.toString())
+        }
+        showMarkers();
+        showPanel();
+        $('#day-add').prev().remove();
+
+    })
 
 })
