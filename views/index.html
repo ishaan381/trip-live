@@ -1,5 +1,3 @@
-
-Ethan Lee [10:31 AM]
 {% extends 'layout.html' %} {% block title %}Your Trip{% endblock %} {% block content %}
 <div id="app" class="clearfix">
  <div class="map-container col-sm-8 col-lg-9">
@@ -55,36 +53,33 @@ Ethan Lee [10:31 AM]
        <div class="panel-heading">
          <div class="day-buttons">
            <button class="btn btn-circle day-btn">1</button>
-           <button class="btn btn-circle day-btn current-day">2</button>
-           <button class="btn btn-circle day-btn">3</button>
            <button class="btn btn-circle day-btn" id="day-add">+</button>
          </div>
        </div>
        <div class="panel-body" id="itinerary">
          <div>
            <h4>My Hotel</h4>
-           <ul class="list-group" id='list-hotel'>
+           <ul class="list-group" >
              <div class="itinerary-item">
-               <span class="title"></span>
-               <button class="btn btn-xs btn-danger remove btn-circle">x</button>
+               <span class="title" id='list-hotel'></span>
              </div>
            </ul>
          </div>
          <div>
            <h4>My Restaurants</h4>
-           <ul class="list-group" id='list-restaurant'>
+           <ul class="list-group" >
              <div class="itinerary-item">
-               <span class="title"></span>
-               <button class="btn btn-xs btn-danger remove btn-circle">x</button>
+               <span class="title" id='list-restaurant'></span>
+
              </div>
            </ul>
          </div>
          <div>
            <h4>My Activities</h4>
-           <ul class="list-group" id='list-activity'>
+           <ul class="list-group" >
              <div class="itinerary-item">
-               <span class="title"></span>
-               <button class="btn btn-xs btn-danger remove btn-circle">x</button>
+               <span class="title" id='list-activity'></span>
+
              </div>
            </ul>
          </div>
@@ -94,10 +89,10 @@ Ethan Lee [10:31 AM]
  </div>
 </div>
 <script>
- {% autoescape false %}
- var hotels = {{ hotels | json }};
- var restaurants = {{ restaurants | json }};
- var activities = {{ activities | json }};
- {% endautoescape %}
+{% autoescape false %}
+  var hotels = {{ hotels | json }};
+  var restaurants = {{ restaurants | json }};
+  var activities = {{ activities | json }};
+  {% endautoescape %}
 </script>
 {% endblock %}
